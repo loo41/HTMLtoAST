@@ -39,8 +39,9 @@ class AST {
     const tagName = '([a-zA-Z_][\\w\\-\\.]*)'
     const startTag = new RegExp(`^<(${tagName})`)
     const startTagClose = new RegExp('^\\s*(\/?)>') // 结束匹配
-    const attribute = /^\s*([^'"<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"|'([^']*)'))/ // 属性匹配
+    const attribute = /^\s*([^'"<>\/=]+)(?:\s*(=)?\s*(?:"([^"]*)"|'([^']*)'))?/ // 属性匹配
     const endTag = new RegExp(`^</${tagName}\\s*>`)
+    const specialLabel = ['style', 'script'] // 特殊标签
     while(html) {
   
       // 注释 <!---->
@@ -68,18 +69,32 @@ class AST {
       if (startTag) {
         const {flag, tag} = startTag
         const attrs = []
+        while (startTag.attrs.length) {
+          const attr = startTag.attrs.shift()
+          attrs.push({
+            attr: attr[1],
+            value: attr[3] || null
+          })
+        }
+        let index
+        if (index = specialLabel.indexOf(tag) !== -1) {
+          delLabel(index, startTag)
+          continue
+        }
         if (!flag) {
-          while (startTag.attrs.length) {
-            const attr = startTag.attrs.shift()
-            attrs.push({
-              attr: attr[1],
-              value: attr[3]
-            })
-          }
           startNode(tag, attrs, flag)
+        } else {
+          AstStack['children'].push({
+            type: 1,
+            tag,
+            attrs,
+            value: null,
+            children: []
+          })
+          continue
         }
       }
-  
+
       // 文本
       if (/^[^<]/.test(html)) {
         const texts = html.indexOf('<', 1) // vue 中字符级别的优化
@@ -98,6 +113,20 @@ class AST {
         advance(end[0].length)
         endNode()
       }
+    }
+
+    // 处理特殊标签
+    function delLabel (index: number, startTag): void {
+      const {tag} = startTag
+      const special = new RegExp(`</${tag}\\s*>`)
+      let specialLabel: RegExpMatchArray | void = html.match(special)? html.match(special): error('没有结束标签')
+      AstStack['children'].push({
+        type: 1,
+        tag,
+        value: html.substring(0, specialLabel['index']),
+        isSpecial: true,
+      })
+      advance(specialLabel['index'] + specialLabel[0].length)
     }
   
     function textNode(text: string) {
@@ -148,6 +177,7 @@ class AST {
         tag: tagName,
         attrs,
         children: [],
+        value: null,
         type: 1
       }
     }

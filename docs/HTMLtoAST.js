@@ -33,8 +33,9 @@ var AST = /** @class */ (function () {
         var tagName = '([a-zA-Z_][\\w\\-\\.]*)';
         var startTag = new RegExp("^<(" + tagName + ")");
         var startTagClose = new RegExp('^\\s*(\/?)>'); // 结束匹配
-        var attribute = /^\s*([^'"<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"|'([^']*)'))/; // 属性匹配
+        var attribute = /^\s*([^'"<>\/=]+)(?:\s*(=)?\s*(?:"([^"]*)"|'([^']*)'))?/; // 属性匹配
         var endTag = new RegExp("^</" + tagName + "\\s*>");
+        var specialLabel = ['style', 'script']; // 特殊标签
         while (html) {
             // 注释 <!---->
             if (note.test(html)) {
@@ -57,15 +58,30 @@ var AST = /** @class */ (function () {
             if (startTag_1) {
                 var flag = startTag_1.flag, tag = startTag_1.tag;
                 var attrs = [];
+                while (startTag_1.attrs.length) {
+                    var attr = startTag_1.attrs.shift();
+                    attrs.push({
+                        attr: attr[1],
+                        value: attr[3] || null
+                    });
+                }
+                var index = void 0;
+                if (index = specialLabel.indexOf(tag) !== -1) {
+                    delLabel(index, startTag_1);
+                    continue;
+                }
                 if (!flag) {
-                    while (startTag_1.attrs.length) {
-                        var attr = startTag_1.attrs.shift();
-                        attrs.push({
-                            attr: attr[1],
-                            value: attr[3]
-                        });
-                    }
                     startNode(tag, attrs, flag);
+                }
+                else {
+                    AstStack['children'].push({
+                        type: 1,
+                        tag: tag,
+                        attrs: attrs,
+                        value: null,
+                        children: []
+                    });
+                    continue;
                 }
             }
             // 文本
@@ -86,6 +102,19 @@ var AST = /** @class */ (function () {
                 advance(end[0].length);
                 endNode();
             }
+        }
+        // 处理特殊标签
+        function delLabel(index, startTag) {
+            var tag = startTag.tag;
+            var special = new RegExp("</" + tag + "\\s*>");
+            var specialLabel = html.match(special) ? html.match(special) : error('没有结束标签');
+            AstStack['children'].push({
+                type: 1,
+                tag: tag,
+                value: html.substring(0, specialLabel['index']),
+                isSpecial: true,
+            });
+            advance(specialLabel['index'] + specialLabel[0].length);
         }
         function textNode(text) {
             AstStack['children'].push({
@@ -132,6 +161,7 @@ var AST = /** @class */ (function () {
                 tag: tagName,
                 attrs: attrs,
                 children: [],
+                value: null,
                 type: 1
             };
         }
