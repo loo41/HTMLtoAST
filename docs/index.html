@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>HTMLtoAST</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+    .warper {
+      height: inherit;
+      width: inherit;
+      display: flex;
+    }
+    .flex-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .html-input {
+      width: 50%;
+      height: inherit;
+      border-right: 2px solid gray;
+      display: flex;
+      flex-direction: column;
+    }
+    .html-ast {
+      width: 50%;
+      height: inherit;
+      border-left: 2px solid gray;
+    }
+    textarea {
+      padding: 20px;
+    }
+    .start {
+      height: 35px;
+      width: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 20px;
+      user-select: none;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+    .start:hover {
+      background: rgba(0, 0, 0, 0.5)
+    }
+    .content {
+      width: 80%;
+      height: 80%;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="warper">
+    <div class="html-input flex-center">
+      <textarea rows="15" cols="50" autofocus="autofocus" id="text-input"></textarea>
+      <div class="start"> 开始解析 </div>
+    </div>
+    <div class="html-ast flex-center">
+      <pre class="content"></pre>
+    </div>
+  </div>
+  <script src="../HTMLtoAST.js"></script>
+  <script>
+    window.onload = function () {
+      setInputValue()
+      getLess('.start').onclick = function() {
+        parse()
+      }
+      parse()
+    }
+    function parse() {
+      const value = getValue()
+      getLess('.content').innerText = JSON.stringify(new AST({template: value}), null, 1)
+    }
+    function getLess (node) {
+      return document.querySelector(node)
+    }
+    function setInputValue () {
+      const Input = getLess('#text-input')
+      Input.value = `<div id="app">
+  <!-- 默认解析容器 -->
+<div>`
+    }
+    function getValue () {
+      return getLess('#text-input').value
+    }
+  </script>
+</body>
+</html>
