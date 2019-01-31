@@ -349,6 +349,16 @@ define("Utils", ["require", "exports"], function (require, exports) {
             }
             return array;
         };
+        Util.isSomeArrayObj = function ($1, $2) {
+            if ($1.length !== $2.length)
+                return false;
+            return $1.every(function (item, index) {
+                if (!$2[index])
+                    return false;
+                if (item['attr'] === $2[index]['attr'])
+                    return true;
+            });
+        };
         return Util;
     }());
     exports.default = Util;
@@ -393,6 +403,7 @@ define("Diff", ["require", "exports", "Dom", "Utils"], function (require, export
             }
             else {
                 // 获取子节点判断是否都存在
+                this.updateAttr(oldNode.Ele, oldNode.attrs, node.attrs);
                 var oldChild = oldNode.children && oldNode.children.length;
                 var child = node.children && node.children.length;
                 if (!oldChild && !child) {
@@ -408,6 +419,16 @@ define("Diff", ["require", "exports", "Dom", "Utils"], function (require, export
                     this.patchVnode(oldNode.children, node.children);
                 }
             }
+        };
+        Diff.prototype.updateAttr = function (Ele, Attrs, newAttr) {
+            if (Utils_1.default.isSomeArrayObj(Attrs, newAttr)) {
+                return;
+            }
+            console.log('ppp');
+            Attrs.forEach(function (item) {
+                Dom_1.default.removeAttr(Ele, item['attr']);
+            });
+            Dom_1.default.setAttr(Ele, newAttr);
         };
         Diff.prototype.patchVnode = function (oldNode, node) {
             var oldstartIndex = 0, startIndex = 0;

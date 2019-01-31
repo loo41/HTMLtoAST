@@ -36,6 +36,7 @@ export default class Diff {
         }
     } else {
       // 获取子节点判断是否都存在
+      this.updateAttr(oldNode.Ele, oldNode.attrs, node.attrs)
       let oldChild = oldNode.children && oldNode.children.length;
       let child = node.children && node.children.length;
       if (!oldChild && !child) {
@@ -48,6 +49,14 @@ export default class Diff {
         this.patchVnode(oldNode.children, node.children)
       }
     }
+  }
+
+  updateAttr (Ele: Element, Attrs: Array<object>, newAttr: Array<object>) {
+    if (Util.isSomeArrayObj(Attrs, newAttr)) return;
+    Attrs.forEach((item) => {
+      Dom.removeAttr(Ele, item['attr']);
+    })
+    Dom.setAttr(Ele, newAttr);
   }
 
   patchVnode (oldNode: Array<object>, node: Array<object>) {
