@@ -1,7 +1,14 @@
+// "outFile": "./docs/Index.js"
+
 {
   "compilerOptions": {
     "target": "es5",
     "experimentalDecorators": true,
-    "outFile": "./docs/HTMLtoAST.js"
+    "outFile": "./docs/Index.js",
+    "module": "amd",
+    "allowJs": true
   },
+  "files": [
+    "Index.ts"
+  ]
 }

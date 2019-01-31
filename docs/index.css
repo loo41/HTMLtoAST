@@ -1,0 +1,120 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.is-select, .is-select * {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+html, body {
+  height: 100%;
+  width: 100%;
+}
+.warper {
+  height: inherit;
+  width: inherit;
+  display: flex;
+}
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.html-input {
+  width: 50%;
+  height: inherit;
+  border-right: 2px solid gray;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  resize: horizontal;
+}
+.html-input_warper {
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 3px solid gray;
+  overflow: auto;
+  resize: vertical;
+}
+.app {
+  flex: 1;
+}
+.html-ast {
+  flex: 1;
+  height: inherit;
+  border-left: 2px solid gray;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+textarea {
+  padding: 20px;
+}
+.start {
+  height: 35px;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 20px;
+}
+.start:hover {
+  background: rgba(0, 0, 0, 0.5)
+}
+.content {
+  width: 80%;
+  height: 80%;
+  overflow: auto;
+}
+.list-style {
+  height: 60px;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+}
+.list-style div{
+  height: 50px;
+  width: 50px;
+  display: flex;
+  margin: auto;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.explain {
+  height: 60px;
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+}
+.explain div {
+  box-sizing: border-box;
+  padding: 5px;
+  font-size: 16px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
+}
+.message {
+  position: fixed;
+  height: 50px;
+  width: 150px;
+  box-sizing: border-box;
+  padding: 10px;
+  right: 100px;
+  top: 100px;
+  font-size: 18px;
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}

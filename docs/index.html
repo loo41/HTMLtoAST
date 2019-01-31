@@ -4,104 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>HTMLtoAST</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-    }
-    html, body {
-      height: 100%;
-      width: 100%;
-    }
-    .warper {
-      height: inherit;
-      width: inherit;
-      display: flex;
-    }
-    .flex-center {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .html-input {
-      width: 50%;
-      height: inherit;
-      border-right: 2px solid gray;
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-      resize: horizontal;
-    }
-    .html-ast {
-      flex: 1;
-      height: inherit;
-      border-left: 2px solid gray;
-      overflow: auto;
-    }
-    textarea {
-      padding: 20px;
-    }
-    .start {
-      height: 35px;
-      width: 200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 20px;
-      cursor: pointer;
-      background: rgba(0, 0, 0, 0.3);
-      color: white;
-      font-size: 20px;
-      user-select: none;
-      -moz-user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-    }
-    .start:hover {
-      background: rgba(0, 0, 0, 0.5)
-    }
-    .content {
-      width: 80%;
-      height: 80%;
-      overflow: auto;
-    }
-  </style>
+  <title>Vue 原理探索</title>
+  <link rel="stylesheet"  type="text/css" href="./index.css" />
 </head>
 <body>
   <div class="warper">
-    <div class="html-input flex-center">
-      <textarea rows="15" cols="50" autofocus="autofocus" id="text-input"></textarea>
-      <div class="start"> 开始解析 </div>
+    <div class="html-input">
+      <div class="html-input_warper flex-center">
+        <textarea rows="15" cols="50" autofocus="autofocus" id="text-input"></textarea>
+        <div class="start is-select"> 解析 & diff </div>
+      </div>
+      <div class="app flex-center"></div>
     </div>
     <div class="html-ast flex-center">
-      <pre class="content"></pre>
+      <div class="explain is-select">
+        <div>$T 文本节点</div>
+        <div>&C 注释节点</div>
+        <div>&D 文档节点</div>
+        <div>Label 标签节点</div>
+      </div>
     </div>
   </div>
-  <script src="./HTMLtoAST.js"></script>
+
+  <script src="./req.js"></script>
+  <script src="./Index.js"></script>
   <script>
+    let VuV
+
     window.onload = function () {
       setInputValue()
+      require(['Index'], function (Index) {
+        VuV = Index.Index
+        VuV.main({template: getValue(), ele: '.app', dom: '.html-ast'})
+      });
       getLess('.start').onclick = function() {
         parse()
       }
-      parse()
     }
     function parse() {
-      const value = getValue()
-      getLess('.content').innerText = JSON.stringify(new AST({template: value}), null, 1)
+      VuV.main({template: getValue(), ele: '.app', dom: '.html-ast'})
     }
     function getLess (node) {
       return document.querySelector(node)
     }
     function setInputValue () {
       const Input = getLess('#text-input')
-      Input.value = `<div id="app">
-  <!-- 默认解析容器 -->
+      Input.value = `<div id="app" class="flex-center">
+  <!-- Vue 核心算法，估值一个亿 -->
   <p>Hello World</p>
   <style>
     #app {
-      height: 100vw;
+      height: 100px;
+      margin-top: 20px;
+      width: 100px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
     }
   </style>
 </div>`

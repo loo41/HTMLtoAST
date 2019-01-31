@@ -1,3 +1,5 @@
+import {Option, Ast} from './Type'
+
 function warn(message: string) {
   console.warn(message)
 }
@@ -7,33 +9,36 @@ function error(message: string) {
 }
 
 function getHtmlTemplate(root: string): string {
-  return document.querySelector(root).outerHTML
-}
-
-interface Option {
-  el?: string
-  template?: string
+  return document.querySelector(root).outerHTML 
+          || document.body.outerHTML
 }
 
 function log (mes) {
-  return function (target) {
+  return function (target, string, descriptor) {
     console.log(mes)
   }
 }
 
-@log('AST解析开始')
-class AST {
+// Node类对象类型
+enum NodeType {
+  ELEMENT_NODE = 1,
+  TEXT_NODE = 3,
+  COMMENT_NODE = 8,
+  DOCUMENT_TYPE_NODE = 10
+}
 
-  constructor (option) {
+
+export default class AST implements Ast{
+
+  constructor (option: Option) {
     const {el, template} = option
     const html = el? getHtmlTemplate(el): template
-    console.log(template)
     return this.praseHTML(html)
   }
 
+  // @log('AST解析开始')
   praseHTML (html: string) {
-    let AstStack = undefined
-    let root = undefined
+    let AstStack, root
     const stack = []
     const note = /^<!--/
     const tagName = '([a-zA-Z_][\\w\\-\\.]*)'
@@ -85,7 +90,7 @@ class AST {
           startNode(tag, attrs, flag)
         } else {
           AstStack['children'].push({
-            type: 1,
+            type: NodeType.ELEMENT_NODE,
             tag,
             attrs,
             value: null,
@@ -119,9 +124,9 @@ class AST {
     function delLabel (index: number, startTag): void {
       const {tag} = startTag
       const special = new RegExp(`</${tag}\\s*>`)
-      let specialLabel: RegExpMatchArray | void = html.match(special)? html.match(special): error('没有结束标签')
+      let specialLabel: RegExpMatchArray | void = html.match(special)? html.match(special): error(`没有结束标签${tag}`)
       AstStack['children'].push({
-        type: 1,
+        type: NodeType.ELEMENT_NODE,
         tag,
         value: html.substring(0, specialLabel['index']),
         isSpecial: true,
@@ -131,7 +136,7 @@ class AST {
   
     function textNode(text: string) {
       AstStack['children'].push({
-        type: 3,
+        type: NodeType.TEXT_NODE,
         value: text,
         isText: true
       })
@@ -139,7 +144,7 @@ class AST {
 
     function dtdNode(text: string) {
       AstStack['children'].push({
-        type: 10,
+        type: NodeType.DOCUMENT_TYPE_NODE,
         value: text,
         isDTD: true
       })
@@ -147,7 +152,7 @@ class AST {
   
     function noteNode(note: string) {
       AstStack['children'].push({
-        type: 8,
+        type: NodeType.COMMENT_NODE,
         value: note,
         isNote: true
       })
@@ -178,7 +183,7 @@ class AST {
         attrs,
         children: [],
         value: null,
-        type: 1
+        type: NodeType.ELEMENT_NODE
       }
     }
   
