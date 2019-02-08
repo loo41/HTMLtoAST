@@ -421,10 +421,8 @@ define("Diff", ["require", "exports", "Dom", "Utils"], function (require, export
             }
         };
         Diff.prototype.updateAttr = function (Ele, Attrs, newAttr) {
-            if (Utils_1.default.isSomeArrayObj(Attrs, newAttr)) {
+            if (Utils_1.default.isSomeArrayObj(Attrs, newAttr))
                 return;
-            }
-            console.log('ppp');
             Attrs.forEach(function (item) {
                 Dom_1.default.removeAttr(Ele, item['attr']);
             });
@@ -486,16 +484,23 @@ define("Diff", ["require", "exports", "Dom", "Utils"], function (require, export
                 for (var i = startIndex; i <= endIndex; i++) {
                     dom = new Dom_1.default().h([node[i]]);
                     Dom_1.default.insertBeforeNode(oldNode[0]['parent'], dom['Ele'], existingnode);
-                    existingnode = dom;
+                    existingnode = dom['Ele'];
                     oldNode.splice(index, 0, dom);
                     index = i;
                 }
             }
             else if (startIndex > endIndex) {
+                var del = [];
                 for (var i = oldstartIndex; i <= oldEndIndex; i++) {
                     if (oldNode[i]) {
                         Dom_1.default.removeEle(oldNode[0]['parent'], oldNode[i]['Ele']);
+                        del.push(i);
                     }
+                }
+                var $r = del.pop();
+                while ($r) {
+                    oldNode.splice($r, 1);
+                    $r = del.pop();
                 }
             }
         };

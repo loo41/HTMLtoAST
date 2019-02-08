@@ -119,15 +119,22 @@ export default class Diff {
       for (let i = startIndex; i <= endIndex; i++) {
         dom = new Dom().h([node[i]]);
         Dom.insertBeforeNode(oldNode[0]['parent'], dom['Ele'], existingnode);
-        existingnode = dom;
+        existingnode = dom['Ele'];
         oldNode.splice(index, 0, dom);
         index = i;
       }
     } else if (startIndex > endIndex) {
+      let del = [];
       for (let i = oldstartIndex; i <= oldEndIndex; i++) {
         if (oldNode[i]) {
-          Dom.removeEle(oldNode[0]['parent'], oldNode[i]['Ele'])
+          Dom.removeEle(oldNode[0]['parent'], oldNode[i]['Ele']);
+          del.push(i);
         }
+      }
+      let $r = del.pop();
+      while($r) {
+        oldNode.splice($r, 1);
+        $r = del.pop();
       }
     }
   }
