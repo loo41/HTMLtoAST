@@ -42,9 +42,20 @@ export default class Diff {
       if (!oldChild && !child) {
         return
       } else if (!oldChild && child) {
-        Dom.appendEle(oldNode.parent, new Dom().h(node).Ele)
+        node.children.forEach((item) => {
+          if (item.Ele) {
+            Dom.appendEle(oldNode.Ele, item.Ele)
+          } else if (item.Txt) {
+            Dom.appendEle(oldNode.Ele, item.Txt)
+          } else {
+            const nodeEle = new Dom().h([node])
+            Dom.appendEle(oldNode.Ele, nodeEle.Ele? nodeEle.Ele: nodeEle.Txt)
+          }
+          oldNode.children.push(item)
+        })
       } else if (oldChild && !child) {
-        Dom.removeEle(oldNode.parent, oldNode.Ele)
+        oldNode.Ele.innerHTML = ''
+        oldNode.children = []
       } else {
         this.patchVnode(oldNode.children, node.children)
       }

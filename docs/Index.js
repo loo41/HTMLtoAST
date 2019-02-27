@@ -410,10 +410,23 @@ define("Diff", ["require", "exports", "Dom", "Utils"], function (require, export
                     return;
                 }
                 else if (!oldChild && child) {
-                    Dom_1.default.appendEle(oldNode.parent, new Dom_1.default().h(node).Ele);
+                    node.children.forEach(function (item) {
+                        if (item.Ele) {
+                            Dom_1.default.appendEle(oldNode.Ele, item.Ele);
+                        }
+                        else if (item.Txt) {
+                            Dom_1.default.appendEle(oldNode.Ele, item.Txt);
+                        }
+                        else {
+                            var nodeEle = new Dom_1.default().h([node]);
+                            Dom_1.default.appendEle(oldNode.Ele, nodeEle.Ele ? nodeEle.Ele : nodeEle.Txt);
+                        }
+                        oldNode.children.push(item);
+                    });
                 }
                 else if (oldChild && !child) {
-                    Dom_1.default.removeEle(oldNode.parent, oldNode.Ele);
+                    oldNode.Ele.innerHTML = '';
+                    oldNode.children = [];
                 }
                 else {
                     this.patchVnode(oldNode.children, node.children);
